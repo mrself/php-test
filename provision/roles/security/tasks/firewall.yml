@@ -1,0 +1,26 @@
+---
+- name: Install ufw
+  apt:
+   package: ufw
+   state: present
+
+- name: Allow OpenSSH connections
+  ufw:
+   rule: allow
+   name: OpenSSH
+  register: restart ufw
+
+- name: Configure ufw
+  ufw:
+   direction: incoming
+   policy: deny
+  notify: restart ufw
+
+- name: Enable ufw logging
+  ufw:
+   logging: on
+  notify: restart ufw
+
+- name: Enable ufw
+  ufw: state=enabled
+

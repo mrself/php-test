@@ -1,0 +1,3 @@
+# Copy it to ./vagrant-env.rb
+# Local ip of vagrant machine
+$vm_ip="192.168.33.20"

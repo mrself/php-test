@@ -1,0 +1,70 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: false
+  pre_tasks:
+    - raw: sudo apt-get install -y python-simplejson
+    - action: setup
+    - name: Install build-essential for php-xdebug
+      apt:
+        name: build-essential
+        state: present
+
+  roles:
+   - security
+   - geerlingguy.apache
+   - geerlingguy.php-versions
+   - geerlingguy.php
+   - geerlingguy.apache-php-fpm
+   - geerlingguy.mysql
+   - geerlingguy.composer
+   - geerlingguy.php-redis
+   - geerlingguy.php-mysql
+   - geerlingguy.php-memcached
+   - geerlingguy.memcached
+   - geerlingguy.php-xdebug
+  vars:
+   apache_vhosts:
+    - servername: '{{ app_name }}.loc'
+      documentroot: '/var/www/{{ app_name }}.loc{{ document_root if document_root else "" }}'
+      extra_parameters: |
+        ProxyPassMatch ^/(.*\.php(/.*)?)$ "fcgi://127.0.0.1:9000/var/www/{{ app_name }}.loc{{ document_root if document_root else '' }}"
+   php_enable_php_fpm: true
+   php_packages_extra:
+    - 'php{{ php_version }}-zip'
+   ansible_user: vagrant
+   php_version: "7.2"
+   php_xdebug_idekey: PHPSTORM
+   php_xdebug_remote_enable: "true"
+   php_xdebug_remote_host: 192.168.33.1
+  tasks:
+   - name: Add ufw rule for apache
+     ufw:
+      rule: allow
+      name: Apache Full
+     notify: restart ufw
+   - name: Restart php-fpm
+     service:
+       name: php7.2-fpm
+       state: restarted
+   - name: Make vagrant site root
+     file:
+       src: /vagrant
+       dest: '/var/www/{{ app_name }}.loc'
+       state: link
+   - name: Make /vagrant starting shell dir
+     lineinfile:
+       path: /home/vagrant/.bashrc
+       state: present
+       line: cd /vagrant
+   - name: Change host according to app name
+     raw: 'sudo hostname {{ app_name }}'
+   - name: Customize bash prompt
+     lineinfile:
+       path: /home/vagrant/.bashrc
+       state: present
+       line: PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\] \w\[\033[00m\]\n\$ '
+   - name: Install unix2dos
+     apt:
+      name: dos2unix
+      state: present
