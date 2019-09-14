@@ -19,3 +19,7 @@
 ###< symfony/web-server-bundle ###
 
 vagrant-env.rb
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
