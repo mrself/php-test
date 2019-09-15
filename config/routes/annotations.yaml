@@ -5,5 +5,5 @@ controllers:
 api:
     resource: ../../src/Controller/Api/
     type: annotation
-    prefix: /api
+    prefix: /api/v1
     name_prefix: api_
