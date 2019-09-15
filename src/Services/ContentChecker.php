@@ -55,7 +55,7 @@ class ContentChecker
     public function getKeywordsDensity()
     {
         $density = count($this->keywordsUsed) / count($this->words);
-        return round($density, 2);
+        return number_format($density, 2);
     }
 
     private function getWords(string $content)
