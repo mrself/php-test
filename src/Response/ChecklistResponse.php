@@ -82,6 +82,7 @@ class ChecklistResponse
         } catch (InvalidChecklistRequestException $e) {
             return [
                 'success' => false,
+                'reason' => 'Invalid request',
                 'errors' => $e->getErrors()
             ];
         }
